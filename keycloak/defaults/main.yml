@@ -1,1 +1,11 @@
-
+keycloak_container_name: keycloak_web
+keycloak_image: quay.io/keycloak/keycloak:26.2
+keycloak_admin_user: admin
+keycloak_admin_password: GuMa849lo44xSNi
+keycloak_db_user: keycloak
+keycloak_db_password: 33cp6PF4K7eS
+keycloak_db_url: jdbc:postgresql://keycloakdb:5432/keycloak
+keycloak_hostname: keycloak.dev.dhdp.ca
+keycloak_ports:
+  - "8080:8080"
+  - "9000:9000"
