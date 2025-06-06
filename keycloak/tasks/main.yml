@@ -1,1 +1,42 @@
+---
+- name: Install Docker
+  apt:
+    name: docker.io
+    state: present
+    update_cache: true
 
+- name: Ensure Docker service is started
+  systemd:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Pull Keycloak image
+  docker_image:
+    name: "{{ keycloak_image }}"
+    source: pull
+
+- name: Start Keycloak container
+  docker_container:
+    name: "{{ keycloak_container_name }}"
+    image: "{{ keycloak_image }}"
+    restart_policy: always
+    state: started
+    command: start-dev
+    ports: "{{ keycloak_ports }}"
+    env:
+      KEYCLOAK_ADMIN: "{{ keycloak_admin_user }}"
+      KEYCLOAK_ADMIN_PASSWORD: "{{ keycloak_admin_password }}"
+      KC_DB: postgres
+      KC_DB_USERNAME: "{{ keycloak_db_user }}"
+      KC_DB_PASSWORD: "{{ keycloak_db_password }}"
+      KC_DB_URL: "{{ keycloak_db_url }}"
+      KC_PROXY: edge
+      KC_PROXY_HEADERS: xforwarded
+      KC_HOSTNAME: "{{ keycloak_hostname }}"
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+      KC_LOG_LEVEL: debug
