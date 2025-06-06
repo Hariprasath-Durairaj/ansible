@@ -1,0 +1,6 @@
+---
+- name: Deploy Keycloak via Docker
+  hosts: keycloak_host
+  become: true
+  roles:
+    - keycloak
