@@ -1,1 +1,6 @@
+---
+- name: restart keycloak container
+  docker_container:
+    name: "{{ keycloak_container_name }}"
+    state: restarted
 
