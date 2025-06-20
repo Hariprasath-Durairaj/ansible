@@ -1,5 +1,0 @@
----
-- name: restart ecs agent
-  systemd:
-    name: ecs
-    state: restarted

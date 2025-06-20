@@ -1,5 +1,0 @@
-iai_taskrunner_name: dhdptestiai3
-iai_token: "REPLACE_ME"
-storage_path: /data
-venv_path: /home/agent
-proxy_url: http://iai-proxy-ca-central-1-prod.integrateai.net:8888
