@@ -1,0 +1,9 @@
+- name: Deploy Bitnobi
+  hosts: bitnobi-qa
+  become: true
+
+  vars_files:
+    - ../bitnobi/vars/main.yml
+
+  roles:
+    - bitnobi
