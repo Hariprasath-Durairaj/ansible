@@ -1,0 +1,6 @@
+---
+- name: Deploy Integrate.ai Task Runner
+  hosts: integrateai_nodes
+  become: yes
+  roles:
+    - integrateai
