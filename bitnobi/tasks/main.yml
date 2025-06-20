@@ -1,0 +1,67 @@
+---
+- name: Install dependencies
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+  loop:
+    - python3
+    - python3-dev
+    - git
+    - curl
+    - ca-certificates
+    - gnupg
+    - lsb-release
+
+- name: Install Docker and Compose
+  shell: |
+    sudo mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  args:
+    executable: /bin/bash
+
+- name: Add user to docker group
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+
+- name: Login to ACR
+  shell: docker login {{ acr_url }} --username {{ acr_username }} --password {{ acr_password }}
+
+- name: Pull Bitnobi and Jupyter images
+  shell: |
+    docker pull {{ acr_url }}/bitnobi-backend:1.0
+    docker pull {{ acr_url }}/bitnobi-frontend:1.0
+    docker pull {{ acr_url }}/bitnobi-mongodb:1.0
+    docker pull {{ acr_url }}/bitnobi-jupyterhub-scripts:1.0
+    docker pull jupyter/datascience-notebook:latest
+  args:
+    executable: /bin/bash
+
+- name: Extract Bitnobi init scripts
+  shell: |
+    docker run --name temp-bitnobi {{ acr_url }}/bitnobi-backend:1.0 /bin/true
+    docker cp temp-bitnobi:/home/Bitnobi-V1/hostScripts /opt/bitnobi
+    docker rm temp-bitnobi
+  args:
+    executable: /bin/bash
+
+- name: Initialize Bitnobi
+  shell: |
+    cd /opt/bitnobi && ./init.sh <<EOF
+y
+y
+0
+{{ jupyterhub_url }}
+{{ jupyterhub_token }}
+{{ mongodb_password }}
+{{ redis_password }}
+{{ bitnobi_public_url }}
+EOF
+  args:
+    executable: /bin/bash
